@@ -1,0 +1,23 @@
+{% extends "html/base.html" %}
+
+{% block content %}
+    <div class="profession-block">
+        <div class="profession-text">
+            <h4>На Марсе будет {{ prof.lower() }}!</h4>
+        </div>
+        <div class="profession-img-block">
+            <div class="profession-img-label">
+                {{ label_img }}
+            </div>
+            <div class="line">
+                <label></label>
+            </div>
+            <div class="profession-img-label">
+                {{ prof_about }}
+            </div>
+            <div class="profession-img">
+                <img src="{{ img_link }}" alt="{{ alt }}">
+            </div>
+        </div>
+    </div>
+{% endblock %}

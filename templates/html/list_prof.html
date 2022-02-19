@@ -1,0 +1,35 @@
+{% extends "html/base.html" %}
+
+{% block content %}
+    <div class="professions-list-block">
+
+        <label class="list-title">Профессии:</label>
+
+        <div class="alert alert-info" role="alert">
+
+            {% if type_list == 'ol' %}
+
+                <ul>
+                    {% for prof in professions.keys() %}
+                        <li><a class='prof' href="/training/{{ prof }}">{{ prof }}</a></li>
+                    {% endfor %}
+                </ul>
+
+            {% else %}
+                <ol>
+                    {% for prof in professions.keys() %}
+                        <li><a class='prof' href="/training/{{ prof }}">{{ prof }}</a></li>
+                    {% endfor %}
+                </ol>
+
+            {% endif %}
+
+        </div>
+    {% if type_list == 'ul' %}
+        <a href="/list_prof/ol"><button type="button" class="btn btn-primary">Сменить тип списка</button></a>
+    {% else %}
+        <a href="/list_prof/ul"><button type="button" class="btn btn-primary">Сменить тип списка</button></a>
+    {% endif %}
+    </div>
+
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends "html/base.html" %}
+
+{% block content %}
+    <div class="startpage">
+        <div class="card border-info">
+            <div class="card-body-title">
+                <h3>Каюты для экипажа</h3>
+            </div>
+            <div class="accordion accordion-flush" id="accordionFlushExample">
+                {% for room in rooms[0] %}
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="{{ loop.index }}">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-{{ loop.index }}" aria-expanded="false" aria-controls="flush-collapseOne">
+                            {{ room[3] }} {{ room[4] }} — Каюта №{{ loop.index }} — {{ room[2].lower() }}
+                        </button>
+                    </h2>
+                    <div id="flush-{{ loop.index }}" class="accordion-collapse collapse" aria-labelledby="{{ loop.index }}" data-bs-parent="#accordionFlushExample">
+                        <div class="accordion-body">
+                            <small class="text-muted">
+                                <small>
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item"><b>ФИО</b> - {{ room[3] }} {{ room[4] }}</li>
+                                        <li class="list-group-item"><b>Почта</b> - {{ room[5] }}</li>
+                                        <li class="list-group-item"><b>О себе</b> - {{ room[10] }}</li>
+                                        <li class="list-group-item"><b>Обучение</b> - {{ room[8] }}</li>
+                                        <li class="list-group-item"><b>Должность</b> - {{ room[2] }}</li>
+                                        <li class="list-group-item"><b>Специализация</b> - {{ room[9].lower().capitalize() }}</li>
+                                        <li class="list-group-item"></li>
+                                        <li class="list-group-item"><b>Номер каюты</b> - {{ loop.index }}</li>
+                                    </ul>
+                                </small>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="card border-info">
+            <div class="card-body-title">
+                <h3>Каюты для участников экспедиции</h3>
+            </div>
+            <div class="accordion accordion-flush" id="accordionFlushExample">
+                {% for room in rooms[1] %}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="{{ loop.index }}-members">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-{{ loop.index }}-members" aria-expanded="false" aria-controls="flush-collapseOne">
+                                {{ room[1] }} {{ room[2] }} — Каюта №{{ loop.index + shift }} — {{ room[7].lower() }}
+                            </button>
+                        </h2>
+                        <div id="flush-{{ loop.index }}-members" class="accordion-collapse collapse" aria-labelledby="{{ loop.index }}-members" data-bs-parent="#accordionFlushExample">
+                            <div class="accordion-body">
+                                <small class="text-muted">
+                                    <small>
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item"><b>ФИО</b> - {{ room[1] }} {{ room[2] }}</li>
+                                            <li class="list-group-item"><b>Почта</b> - {{ room[3] }}</li>
+                                            <li class="list-group-item"><b>О себе</b> - {{ room[8] }}</li>
+                                            <li class="list-group-item"><b>Обучение</b> - {{ room[6] }}</li>
+                                            <li class="list-group-item"><b>Специализация</b> - {{ room[7].lower().capitalize() }}</li>
+                                            <li class="list-group-item"></li>
+                                            <li class="list-group-item"><b>Номер каюты</b> - {{ loop.index + shift }}</li>
+                                        </ul>
+                                    </small>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

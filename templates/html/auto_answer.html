@@ -1,0 +1,28 @@
+{% extends "html/base.html" %}
+
+{% block content %}
+    <div class="card-body-title">
+        <div class="alert alert-info" role="alert" id="greeting">
+            <h3>Привет, {{ params[2] }}!</h3>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="profile-img">
+            <!img src="https://www.netclipart.com/pp/m/262-2627137_anime-clipart-profile-anime-girl-with-a-welcome.png" alt="тут должна быть картинка приветствия, но её почему-то нет 🤷‍♂">
+        </div>
+        <div class="profile-block">
+            <div class="info">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><b>Имя</b> - {{ params[2] }}</li>
+                    <li class="list-group-item"><b>Фамилия</b> - {{ params[1] }}</li>
+                    <li class="list-group-item"><b>Почта</b> - {{ params[3] }}</li>
+                    <li class="list-group-item"><b>Пол</b> - {{ params[5] }}</li>
+                    <li class="list-group-item"><b>О себе</b> - {{ params[8] }}</li>
+                    <li class="list-group-item"><b>Обучение</b> - {{ params[6] }}</li>
+                    <li class="list-group-item"><b>Специализация</b> - {{ params[7].lower().capitalize() }}</li>
+                    <li class="list-group-item"><b>Дата регистрации</b> - {{ params[9] }}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "html/base.html" %}
+
+{% block content %}
+    <div class="login-container">
+        <div class="card-body-title">
+            <h3>Авторизация</h3>
+        </div>
+        <div class="login_form">
+            <div class="card border-info">
+                <form action="" method="post" novalidate>
+                    {{ form.hidden_tag() }}
+                    <div class="login-login">
+                        <b>{{ form.email.label }}</b><br>
+                        {{ form.email(class="form-control") }}<br>
+                        {% for error in form.errors.email %}
+                            <small class="form-text text-muted ">
+                                <font color="red">{{ ''.join(error) }}</font>
+                            </small>
+                        {% endfor %}
+                        <small class="form-text text-muted">
+                            <font color="red">{{ incorrect_login }}</font>
+                        </small>
+                    </div>
+                    <div class="login-password">
+                        <b>{{ form.password.label }}</b><br>
+                        {{ form.password(class="form-control", type="password") }}<br>
+                        {% for error in form.errors.password %}
+                            <small class="form-text text-muted ">
+                                <font color="red">{{ ''.join(error) }}</font>
+                            </small>
+                        {% endfor %}
+                        <small class="form-text text-muted">
+                            <font color="red">{{ incorrect_password }}</font>
+                        </small>
+                    </div>
+                    <div class="login-button">
+                        {{ form.submit(type="submit", class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    <div class="login-for-crew">
+        <div class="card border-info">
+            <div class="login-for-crew-label">
+                <h3>Авторизация для членов экипажа</h3>
+                <small class="form-text text-muted">
+                    Если Вы являетесь членом экипажа, то можете пройти верификацию здесь!
+                </small>
+            </div>
+            <div class="login-for-crew-btn">
+                <a href="/login_for_crew">{{ form.submit_crew(type="submit", class="btn btn-primary") }}</a>
+            </div>
+        </div>
+    </div>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,26 @@
+.profession-block {
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 16px;
+    padding-right: 16px;
+    margin-bottom: 5px;
+    alignment: right;
+}
+
+.profession-text {
+    height: auto;
+    text-align: center;
+}
+.profession-img-label {
+    height: 30px;
+    text-align: center;
+}
+
+.line {
+    text-align: center;
+    border-top: 2px solid #A5D6D9;
+}
+
+.profession-img {
+    text-align: center;
+}

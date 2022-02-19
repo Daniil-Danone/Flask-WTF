@@ -1,0 +1,108 @@
+.professions-list-block {
+    max-width: 1170px;
+    margin-top: 30px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 16px;
+    padding-right: 16px;
+    alignment: right;
+}
+
+.list-title {
+    font-family: Calibri, sans-serif;
+    font-size: 30px;
+    color: black;
+    background: #eaf7ff;
+    margin-bottom: 16px;
+    text-align: left;
+}
+
+
+.card-body-title {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.form-select {
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+}
+
+.form-control {
+    margin-bottom: 5px;
+}
+
+.form-label {
+    margin-bottom: -3px;
+}
+
+.select-label {
+    margin-top: 10px;
+}
+
+.form-check {
+    margin: 2px;
+}
+
+.profile-img img {
+    text-align: center;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    width:300px;
+    height:300px;
+    object-fit:cover
+}
+
+.card {
+    margin-top: 20px;
+    margin-bottom: 30px;
+}
+
+.form-contact .invalid {
+    display: inline-block;
+    background: #FF9898;
+}
+
+.registration-form {
+    font-size: 14px;
+}
+
+.login-login {
+    margin: 20px;
+}
+
+.login-password {
+    margin: 20px;
+}
+
+.login-button {
+    margin: 20px;
+}
+
+.login-for-crew {
+    text-align: center;
+}
+
+.login-for-crew-label {
+    margin: 10px
+}
+
+.login-for-crew-btn {
+    margin-bottom: 15px;
+}
+.login-form-crew-login-login {
+    margin: 20px;
+}
+.login-form-crew-login-password {
+    margin: 20px;
+}
+.login-form-crew-login-login2 {
+    margin: 20px;
+}
+.login-form-crew-login-password2 {
+    margin: 20px;
+}
+.login-form-crew-confirm-button {
+    margin: 20px;
+}

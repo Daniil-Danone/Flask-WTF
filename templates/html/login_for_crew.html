@@ -1,0 +1,86 @@
+{% extends "html/base.html" %}
+
+{% block content %}
+    <div class="login-form-crew-confirm-container">
+        <div class="card-body-title">
+            <h3>Авторизация</h3>
+            <small class="form-text text-muted">
+                Пароли капитана (демо-версии) хранится в базе данных "site_crew.db".
+                Тестовый ID: 2403, пароль: Kolevatykh55
+            </small>
+        </div>
+<!------------------------------------------------------------------------------------------------------------------------------------------------->
+        <div class="login-form-crew-form">
+            <div class="card border-info">
+                <form action="" method="post" novalidate>
+                    {{ form.hidden_tag() }}
+
+                    <div class="login-form-crew-login-login">
+                        <b>{{ form.id_captain.label }}</b><br>
+                        {{ form.id_captain(class="form-control") }}<br>
+
+                        {% for error in form.errors.id_captain %}
+                            <small class="form-text text-muted ">
+                                <font color="red">{{ ''.join(error) }}</font>
+                            </small>
+                        {% endfor %}
+
+                        <small class="form-text text-muted">
+                            <font color="red">{{ incorrect_login_cap }}</font>
+                        </small>
+                    </div>
+<!------------------------------------------------------------------------------------------------------------------------------------------------->
+                    <div class="login-form-crew-login-password">
+                        <b>{{ form.password_captain.label }}</b><br>
+                        {{ form.password_captain(class="form-control", type="password") }}<br>
+
+                        {% for error in form.errors.password_captain %}
+                            <small class="form-text text-muted ">
+                                <font color="red">{{ ''.join(error) }}</font>
+                            </small>
+                        {% endfor %}
+
+                        <small class="form-text text-muted">
+                            <font color="red">{{ incorrect_password_cap }}</font>
+                        </small>
+                    </div>
+<!------------------------------------------------------------------------------------------------------------------------------------------------->
+                    <div class="login-form-crew-login-login2">
+                        <b>{{ form.id_astr.label }}</b><br>
+                        {{ form.id_astr(class="form-control") }}<br>
+
+                        {% for error in form.errors.id_astr %}
+                            <small class="form-text text-muted ">
+                                <font color="red">{{ ''.join(error) }}</font>
+                            </small>
+                        {% endfor %}
+
+                        <small class="form-text text-muted">
+                            <font color="red">{{ incorrect_login }}</font>
+                        </small>
+                    </div>
+<!------------------------------------------------------------------------------------------------------------------------------------------------->
+                    <div class="login-form-crew-login-password2">
+                        <b>{{ form.password_astr.label }}</b><br>
+                        {{ form.password_astr(class="form-control", type="password") }}<br>
+
+                        {% for error in form.errors.password_astr %}
+                            <small class="form-text text-muted ">
+                                <font color="red">{{ ''.join(error) }}</font>
+                            </small>
+                        {% endfor %}
+
+                        <small class="form-text text-muted">
+                            <font color="red">{{ incorrect_password }}</font>
+                        </small>
+                    </div>
+<!------------------------------------------------------------------------------------------------------------------------------------------------->
+                    <div class="login-form-crew-confirm-button">
+                        {{ form.submit_crew_confirm(type="submit", class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

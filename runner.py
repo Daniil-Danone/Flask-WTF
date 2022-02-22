@@ -1,5 +1,7 @@
 import os
 import sqlite3
+from static.data.users import User
+from static.data import db_session
 from datetime import datetime
 from static.other.professions import professions
 from static.python.loginform import RegistrationForm, LoginForm, CrewLoginFormConfirm
@@ -28,25 +30,29 @@ def default():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    db_session.global_init("static/databases/blogs.db")
     form = LoginForm()
     if form.validate_on_submit():
-        data = login_check_db(request.form['email'])
-        if data:
-            if data[4] == request.form['password']:
-                return redirect(f'/profile/{request.form["email"]}')
-            elif data[4] != request.form['password']:
-                return render_template('html/login.html',
-                                       title='Авторизация',
-                                       form=form,
-                                       menu_bar_title='Миссия колонизация Марса!',
-                                       incorrect_password='Пароль введён неверно!')
-        else:
+        db_sess = db_session.create_session()
+        if not db_sess.query(User).filter(User.email == request.form['email']).first():
             return render_template('html/login.html',
                                    title='Авторизация',
                                    form=form,
                                    incorrect_login='Аккаунта с таким логином не существует! '
                                                    'Пожалуйста, проверьте правильность его ввода.',
                                    menu_bar_title='Миссия колонизация Марса!')
+
+        else:
+            user = db_sess.query(User).filter(User.email == request.form['email']).first()
+            if user.check_password(request.form['password']):
+                return redirect(f'/profile/{request.form["email"]}')
+            else:
+                return render_template('html/login.html',
+                                       title='Авторизация',
+                                       form=form,
+                                       menu_bar_title='Миссия колонизация Марса!',
+                                       incorrect_password='Пароль введён неверно!')
+
     return render_template('html/login.html',
                            title='Авторизация',
                            form=form,
@@ -55,6 +61,7 @@ def login():
 
 @app.route('/login_for_crew', methods=['GET', 'POST'])
 def login_for_crew():
+    db_session.global_init("static/databases/blogs.db")
     form = CrewLoginFormConfirm()
     if form.validate_on_submit():
         data = login_check_crew_db(request.form['id_captain'])
@@ -86,15 +93,26 @@ def success():
 
 @app.route('/reg', methods=['POST', 'GET'])
 def reg():
-    form = RegistrationForm()
     html_file = "html/registration_form.html"
+    form = RegistrationForm()
+    user = User()
+
+    db_session.global_init("static/databases/blogs.db")
+
     if form.validate_on_submit():
-        try:
-            user_info['surname'] = request.form['surname']
-            user_info['name'] = request.form['name']
-            user_info['email'] = request.form['email']
-            user_info['password'] = request.form['password']
-            user_info['studying'] = request.form['studying']
+        db_sess = db_session.create_session()
+        if db_sess.query(User).filter(User.email == form.email.data).first():
+            return render_template(html_file,
+                                   form=form,
+                                   title='Регистрация',
+                                   menu_bar_title='Миссия колонизация Марса!',
+                                   email_exist='Пользователь с данной почтой уже существует!')
+        else:
+            user.surname = request.form['surname']
+            user.name = request.form['name']
+            user.email = request.form['email']
+            user.hashed_password = request.form['password']
+            user.studying = request.form['studying']
             profs = []
             for i in ['engineer', 'pilot', 'builder', 'coolman', 'fatman', 'instagirl', 'doctor']:
                 try:
@@ -102,17 +120,16 @@ def reg():
                 except:
                     continue
 
-            user_info['professions'] = profs
-            user_info['accept'] = request.form['accept']
-            user_info['sex'] = request.form['sex']
-            user_info['about'] = request.form['about']
-            print(user_info)
-        finally:
-            data = datetime.now().strftime('"%a, %d %b %Y %H:%M:%S')
-            insert_data_to_db(surname=user_info['surname'], name=user_info['name'], email=user_info['email'],
-                              password=user_info['password'], sex=user_info['sex'], studying=user_info['studying'],
-                              profs=', '.join(user_info['professions']), about=user_info['about'], reg_data=data)
-            return redirect(f'/profile/{user_info["email"]}')
+            user.professions = ', '.join(profs)
+            user.sex = request.form['sex']
+            user.about = request.form['about']
+            user.set_password(request.form['password'])
+            user.created_date = datetime.now().strftime('%a, %d %b %Y %H:%M:%S')
+            db_sess = db_session.create_session()
+            db_sess.add(user)
+            db_sess.commit()
+            return redirect(f'/profile/{user.email}')
+
     return render_template(html_file,
                            form=form,
                            title='Регистрация',
@@ -121,11 +138,13 @@ def reg():
 
 @app.route('/profile/<email>', methods=['POST', 'GET'])
 def answer(email):
-    data = login_check_db(email)
+    db_session.global_init("static/databases/blogs.db")
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).filter(User.email == email).first()
     html_file = 'html/auto_answer.html'
     return render_template(html_file,
                            title='Профиль',
-                           params=data,
+                           params=user,
                            menu_bar_title='Миссия колонизация Марса!', )
 
 

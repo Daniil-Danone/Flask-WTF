@@ -3,7 +3,7 @@
 {% block content %}
     <div class="card-body-title">
         <div class="alert alert-info" role="alert" id="greeting">
-            <h3>Привет, {{ params[2] }}!</h3>
+            <h3>Привет, {{ params.name }}!</h3>
         </div>
     </div>
     <div class="card-body">
@@ -13,14 +13,14 @@
         <div class="profile-block">
             <div class="info">
                 <ul class="list-group list-group-flush">
-                    <li class="list-group-item"><b>Имя</b> - {{ params[2] }}</li>
-                    <li class="list-group-item"><b>Фамилия</b> - {{ params[1] }}</li>
-                    <li class="list-group-item"><b>Почта</b> - {{ params[3] }}</li>
-                    <li class="list-group-item"><b>Пол</b> - {{ params[5] }}</li>
-                    <li class="list-group-item"><b>О себе</b> - {{ params[8] }}</li>
-                    <li class="list-group-item"><b>Обучение</b> - {{ params[6] }}</li>
-                    <li class="list-group-item"><b>Специализация</b> - {{ params[7].lower().capitalize() }}</li>
-                    <li class="list-group-item"><b>Дата регистрации</b> - {{ params[9] }}</li>
+                    <li class="list-group-item"><b>Имя</b> - {{ params.name }}</li>
+                    <li class="list-group-item"><b>Фамилия</b> - {{ params.surname }}</li>
+                    <li class="list-group-item"><b>Почта</b> - {{ params.email }}</li>
+                    <li class="list-group-item"><b>Пол</b> - {{ params.sex }}</li>
+                    <li class="list-group-item"><b>О себе</b> - {{ params.about }}</li>
+                    <li class="list-group-item"><b>Обучение</b> - {{ params.studying }}</li>
+                    <li class="list-group-item"><b>Специализация</b> - {{ params.professions.lower().capitalize() }}</li>
+                    <li class="list-group-item"><b>Дата регистрации</b> - {{ params.created_date }}</li>
                 </ul>
             </div>
         </div>

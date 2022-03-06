@@ -122,7 +122,7 @@ def registration():
 
             user.professions = ', '.join(profs)
             user.sex = request.form['sex']
-            user.about = request.form['about']
+            user.about = request.form['text']
             user.set_password(request.form['password'])
             user.created_date = datetime.now().strftime('%a, %d %b %Y %H:%M:%S')
             db_sess = db_session.create_session()
@@ -143,6 +143,7 @@ def create_job():
     form = CreateJob()
     job = Jobs()
     db_session.global_init("static/databases/my_site.db")
+
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         if db_sess.query(User).filter(User.id == form.team_leader_id.data).first() or db_sess.query(Crew).filter(Crew.uniq_crew_id == form.team_leader_id.data).first():
@@ -177,7 +178,7 @@ def create_job():
                 db_sess.merge(current_user)
                 db_sess.add(job)
                 db_sess.commit()
-                return redirect('/')
+                return redirect('/job_list')
             else:
                 return render_template(html_file,
                                        form=form,
@@ -196,7 +197,7 @@ def create_job():
 def edit_job(id):
     form = CreateJob()
     html_file = "html/create_job.html"
-    db_session.global_init("static/databases/my_site.db")
+    job = Jobs()
     if request.method == "GET":
         db_sess = db_session.create_session()
         job = db_sess.query(Jobs).filter(Jobs.id == id,
@@ -213,6 +214,51 @@ def edit_job(id):
             form.is_finished.data = job.is_finished
         else:
             abort(404)
+
+    if form.validate_on_submit():
+        print('OK')
+        db_sess = db_session.create_session()
+        job = db_sess.query(Jobs).filter(Jobs.id == id,
+                                         Jobs.creator == current_user.id
+                                         ).first()
+        if db_sess.query(User).filter(User.id == form.team_leader_id.data).first() or db_sess.query(Crew).filter(Crew.uniq_crew_id == form.team_leader_id.data).first():
+            collabs = True
+            for i in form.collaborators.data.split(', '):
+                if not db_sess.query(User).filter(User.id == i).first():
+                    collabs = False
+                    break
+            if collabs is True:
+                job.job_title = form.job_title.data
+                if len(form.job_describe.data) > 40:
+                    text = ''
+                    output_text = ''
+                    for i in form.job_describe.data.split():
+                        if len(i) + len(text) < 40:
+                            text = text + i + ' '
+                        else:
+                            output_text = output_text + text + '\n'
+                            text = i + " "
+                    output_text = output_text + text
+                    job.job_describe = output_text
+                else:
+                    job.job_describe = form.job_describe.data
+                job.team_leader = form.team_leader_id.data
+                job.work_size = form.work_size.data
+                job.collaborators = form.collaborators.data
+                job.start_date = form.start_date.data
+                job.end_date = form.end_date.data
+                job.is_finished = form.is_finished.data
+                job.creator = current_user.id
+                db_sess.merge(current_user)
+                db_sess.commit()
+                return redirect('/job_list')
+            else:
+                return render_template(html_file,
+                                       form=form,
+                                       card_title='Создание работы',
+                                       title='Создание работы',
+                                       menu_bar_title='Миссия колонизация Марса!',
+                                       message='Что-то пошло не так!')
     return render_template(html_file,
                            form=form,
                            card_title='Изменение работы',
@@ -232,7 +278,7 @@ def news_delete(id):
         db_sess.commit()
     else:
         abort(404)
-    return redirect('/')
+    return redirect('/job_list')
 
 
 @app.route('/job_list', methods=['POST', 'GET'])

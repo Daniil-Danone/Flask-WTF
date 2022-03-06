@@ -47,7 +47,7 @@ def login():
         user = db_sess.query(User).filter(User.email == form.email.data).first()
         if user and user.check_password(form.password.data):
             login_user(user, remember=form.remember_me.data)
-            return redirect("/list_prof/ul")
+            return redirect("/")
         return render_template('html/login.html',
                                incorrect_password='Неправильный логин или пароль',
                                menu_bar_title='Миссия колонизация Марса!',

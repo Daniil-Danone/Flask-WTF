@@ -103,6 +103,7 @@ class LoginForm(FlaskForm):
                              name='password',
                              render_kw={"placeholder": "Введите пароль..."})
 
+    remember_me = BooleanField('Запомнить меня')
     submit = SubmitField('Войти')
 
     submit_crew = SubmitField('Продолжить')

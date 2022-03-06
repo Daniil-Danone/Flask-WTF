@@ -1,14 +1,17 @@
 import os
 import sqlite3
+from datetime import datetime
 from static.data.users import User
 from static.data import db_session
-from datetime import datetime
+from flask_login import LoginManager, login_user, login_required, logout_user
 from static.other.professions import professions
 from static.python.loginform import RegistrationForm, LoginForm, CrewLoginFormConfirm
 from flask import Flask, render_template, request, redirect
 
 
 app = Flask(__name__)
+login_manager = LoginManager()
+login_manager.init_app(app)
 
 
 imgFolder = os.path.join('static', 'img')
@@ -17,6 +20,13 @@ app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 
 
 user_info = {}
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    db_session.global_init("static/databases/blogs.db")
+    db_sess = db_session.create_session()
+    return db_sess.query(User).get(user_id)
 
 
 @app.route('/', methods=['POST', 'GET'])
@@ -29,6 +39,30 @@ def default():
 
 
 @app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    db_session.global_init("static/databases/blogs.db")
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        user = db_sess.query(User).filter(User.email == form.email.data).first()
+        if user and user.check_password(form.password.data):
+            login_user(user, remember=form.remember_me.data)
+            return redirect("/")
+        return render_template('html/login.html',
+                               incorrect_password='Неправильный логин или пароль',
+                               menu_bar_title='Миссия колонизация Марса!',
+                               form=form)
+    return render_template('html/login.html', title='Авторизация', form=form, menu_bar_title='Миссия колонизация Марса!')
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect("/")
+
+
+'''@app.route('/login', methods=['GET', 'POST'])
 def login():
     db_session.global_init("static/databases/blogs.db")
     form = LoginForm()
@@ -56,7 +90,7 @@ def login():
     return render_template('html/login.html',
                            title='Авторизация',
                            form=form,
-                           menu_bar_title='Миссия колонизация Марса!')
+                           menu_bar_title='Миссия колонизация Марса!')'''
 
 
 @app.route('/login_for_crew', methods=['GET', 'POST'])
@@ -91,7 +125,7 @@ def success():
     return 'Вход выполнен'
 
 
-@app.route('/reg', methods=['POST', 'GET'])
+@app.route('/register', methods=['POST', 'GET'])
 def reg():
     html_file = "html/registration_form.html"
     form = RegistrationForm()

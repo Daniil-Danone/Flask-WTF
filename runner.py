@@ -2,6 +2,7 @@ import os
 import sqlite3
 from datetime import datetime
 from static.data.users import User
+from static.data.crew import Crew
 from static.data import db_session
 from flask_login import LoginManager, login_user, login_required, logout_user
 from static.other.professions import professions
@@ -197,9 +198,14 @@ def list_professions(list_type):
 @app.route('/distribution/', methods=['POST', 'GET'])
 def distribution():
     html_file = "html/distribution.html"
-
-    data_crew = get_all_crew()
-    data_members = get_all_members()
+    db_session.global_init("static/databases/blogs.db")
+    db_sess = db_session.create_session()
+    data_members = [[user.surname, user.name, user.sex, user.email, user.studying, user.professions, user.about,
+                     user.created_date] for user in db_sess.query(User).all()]
+    db_session.global_init("static/databases/blogs.db")
+    db_sess = db_session.create_session()
+    data_crew = [[user.surname, user.name, user.post, user.email, user.studying, user.professions, user.about,
+                  user.created_date] for user in db_sess.query(Crew).all()]
 
     return render_template(html_file,
                            title='Список профессий',
@@ -207,74 +213,6 @@ def distribution():
                            rooms=[data_crew, data_members],
                            shift=len(data_crew))
 
-
-def insert_data_to_db(surname, name, email, password, sex, studying, profs, about, reg_data):
-    con = sqlite3.connect('static/databases/site_users.db')
-    cur = con.cursor()
-
-    cur.execute('''CREATE TABLE IF NOT EXISTS users (id_num INTEGER PRIMARY KEY, surname TEXT, name TEXT, email TEXT, 
-    password TEXT, sex TEXT, studying TEXT, profs TEXT, about TEXT, reg_data TEXT)''')
-
-    cur.execute('''INSERT into users (surname, name, email, password, sex, studying, profs, about, reg_data) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''', (surname, name, email, password, sex, studying, profs, about, reg_data))
-
-    con.commit()
-    con.close()
-
-
-def login_check_db(email):
-    con = sqlite3.connect('static/databases/site_users.db')
-    cur = con.cursor()
-
-    cur.execute('''CREATE TABLE IF NOT EXISTS users (id_num INTEGER PRIMARY KEY, surname TEXT, name TEXT, email TEXT, 
-        password TEXT, sex TEXT, studying TEXT, profs TEXT, about TEXT, reg_data TEXT)''')
-
-    data = cur.execute(f'''SELECT * FROM users WHERE email=?''', (email,)).fetchone()
-
-    con.commit()
-    con.close()
-    return data
-
-
-def login_check_crew_db(id):
-    con = sqlite3.connect('static/databases/site_crew.db')
-    cur = con.cursor()
-
-    cur.execute('''CREATE TABLE IF NOT EXISTS crew (id_num INTEGER PRIMARY KEY, id INT, surname TEXT, name TEXT, email TEXT, 
-            password TEXT, sex TEXT, studying TEXT, profs TEXT, about TEXT, reg_data TEXT)''')
-
-    data = cur.execute(f'''SELECT * FROM crew WHERE id=?''', (id,)).fetchone()
-
-    con.commit()
-    con.close()
-    return data
-
-
-def get_all_crew():
-    con = sqlite3.connect('static/databases/site_crew.db')
-    cur = con.cursor()
-    cur.execute('''CREATE TABLE IF NOT EXISTS crew (id_num INTEGER PRIMARY KEY, id INT, surname TEXT, name TEXT, email TEXT, 
-                password TEXT, sex TEXT, studying TEXT, profs TEXT, about TEXT, reg_data TEXT)''')
-
-    data = cur.execute(f'''SELECT * FROM crew''').fetchall()
-
-    con.commit()
-    con.close()
-    return data
-
-
-def get_all_members():
-    con = sqlite3.connect('static/databases/site_users.db')
-    cur = con.cursor()
-
-    cur.execute('''CREATE TABLE IF NOT EXISTS users (id_num INTEGER PRIMARY KEY, surname TEXT, name TEXT, email TEXT, 
-            password TEXT, sex TEXT, studying TEXT, profs TEXT, about TEXT, reg_data TEXT)''')
-
-    data = cur.execute(f'''SELECT * FROM users''').fetchall()
-
-    con.commit()
-    con.close()
-    return data
 
 
 if __name__ == '__main__':

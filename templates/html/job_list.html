@@ -16,6 +16,7 @@
                 <th scope="col">Начало работ</th>
                 <th scope="col">Окончание работ</th>
                 <th scope="col">Статус</th>
+                <th scope="col">Изменение</th>
             </thead>
             <tbody>
                 {% for job in jobs %}
@@ -33,6 +34,18 @@
                         {% else %}
                             <td class="table-success align-middle">Выполнено</td>
                         {% endif %}
+                        <td class="align-middle">
+                            {% if current_user.is_authenticated and current_user.id == job.creator %}
+                                <div>
+                                    <a href="/edit_job/{{ job.id }}" class="btn btn-warning">
+                                        Изменить
+                                    </a>
+                                    <a href="/job_delete/{{ job.id }}" class="btn btn-danger">
+                                        Удалить
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>

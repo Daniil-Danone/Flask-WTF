@@ -151,6 +151,7 @@ class CreateJob(FlaskForm):
                            name='end_date',
                            id='end_date',
                            render_kw={"placeholder": "Введите планируемую дату окончания работ..."})
+
     is_finished = BooleanField('Работа окончена?')
 
 

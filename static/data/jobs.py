@@ -16,5 +16,6 @@ class Jobs(SqlAlchemyBase, UserMixin):
     collaborators = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     start_date = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     end_date = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    creator = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
     is_finished = sqlalchemy.Column(sqlalchemy.Boolean, nullable=True)
     is_only_for_crew = sqlalchemy.Column(sqlalchemy.Boolean, nullable=True)

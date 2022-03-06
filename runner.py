@@ -5,10 +5,10 @@ from static.data.users import User
 from static.data.crew import Crew
 from static.data.jobs import Jobs
 from static.data import db_session
-from flask_login import LoginManager, login_user, login_required, logout_user
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from static.other.professions import professions
 from static.python.loginform import RegistrationForm, LoginForm, CrewLoginFormConfirm, CreateJob
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, abort
 
 
 app = Flask(__name__)
@@ -137,6 +137,7 @@ def registration():
 
 
 @app.route('/create_job', methods=['POST', 'GET'])
+@login_required
 def create_job():
     html_file = "html/create_job.html"
     form = CreateJob()
@@ -172,19 +173,66 @@ def create_job():
                 job.start_date = form.start_date.data
                 job.end_date = form.end_date.data
                 job.is_finished = form.is_finished.data
+                job.creator = current_user.id
+                db_sess.merge(current_user)
                 db_sess.add(job)
                 db_sess.commit()
                 return redirect('/')
             else:
                 return render_template(html_file,
                                        form=form,
+                                       card_title='Создание работы',
                                        title='Создание работы',
                                        menu_bar_title='Миссия колонизация Марса!',
                                        message='Что-то пошло не так!')
     return render_template(html_file,
                            form=form,
+                           card_title='Создание работы',
                            title='Создание работы',
                            menu_bar_title='Миссия колонизация Марса!')
+
+
+@app.route('/edit_job/<int:id>', methods=['POST', 'GET'])
+def edit_job(id):
+    form = CreateJob()
+    html_file = "html/create_job.html"
+    db_session.global_init("static/databases/my_site.db")
+    if request.method == "GET":
+        db_sess = db_session.create_session()
+        job = db_sess.query(Jobs).filter(Jobs.id == id,
+                                         Jobs.creator == current_user.id
+                                         ).first()
+        if job:
+            form.job_title.data = job.job_title
+            form.job_describe.data = ' '.join(job.job_describe.split())
+            form.team_leader_id.data = job.team_leader
+            form.work_size.data = job.work_size
+            form.collaborators.data = job.collaborators
+            form.start_date.data = job.start_date
+            form.end_date.data = job.end_date
+            form.is_finished.data = job.is_finished
+        else:
+            abort(404)
+    return render_template(html_file,
+                           form=form,
+                           card_title='Изменение работы',
+                           title='Создание работы',
+                           menu_bar_title='Миссия колонизация Марса!')
+
+
+@app.route('/job_delete/<int:id>', methods=['GET', 'POST'])
+@login_required
+def news_delete(id):
+    db_sess = db_session.create_session()
+    job = db_sess.query(Jobs).filter(Jobs.id == id,
+                                     Jobs.creator == current_user.id
+                                     ).first()
+    if job:
+        db_sess.delete(job)
+        db_sess.commit()
+    else:
+        abort(404)
+    return redirect('/')
 
 
 @app.route('/job_list', methods=['POST', 'GET'])

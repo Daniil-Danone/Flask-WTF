@@ -1,11 +1,11 @@
 {% extends "html/base.html" %}
 
 {% block content %}
-    <div class="card-body-title">
+    <div class="card-body-title creating-job-form-title">
         <h3>{{ card_title }}</h3>
     </div>
     <div class="registration-form">
-        <div class="card border-info">
+        <div class="card border-info creating-job-form">
             <div class="card-body">
                 <form class="row g-3" method="post" novalidate>
                     {{ form.hidden_tag() }}

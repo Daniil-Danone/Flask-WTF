@@ -109,15 +109,17 @@
 
 .news-index-page-title {
     margin-top: 10px;
+    margin-bottom: 20px;
     text-align: center;
     border-bottom: 1px solid #ced4da;
 }
 .news-index-page {
-    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
 .text-index-page {
     margin-top: 20px;
+    margin-bottom: 20px;
     border-top: none;
     border-right: none;
     border-left: none;
@@ -125,6 +127,7 @@
 
 .text-index-page-title {
     margin-top: 10px;
+    margin-bottom: 20px;
     text-align: center;
     border-bottom: 1px solid #ced4da;
 }
@@ -136,4 +139,85 @@
 
 .news-title {
     text-align: center;
+}
+
+.distribution {
+    margin: 20px;
+}
+.distribution-title {
+    text-align: center;
+    margin: 10px;
+}
+
+.creating-job-form-title {
+    margin: 20px;
+    text-align: center;
+}
+
+.creating-job-form {
+    margin: 20px;
+    border-right: none;
+    border-left: none;
+    border-bottom: none;
+}
+
+.registration-form-card {
+    margin: 20px;
+    border-right: none;
+    border-left: none;
+    border-bottom: none;
+}
+
+.registration-form-card-title {
+    margin: 20px;
+    text-align: center;
+}
+
+.login-form-title {
+    margin: 20px;
+    text-align: center;
+}
+
+.login-form {
+    margin: 20px;
+    border-right: none;
+    border-left: none;
+    border-bottom: none;
+}
+
+.job-list-title {
+    margin: 20px;
+    text-align: center;
+}
+
+.job-list {
+    margin-bottom: 30px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+html,
+body {
+  height: 100%;
+}
+.wrapper {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+main {
+    flex: 1 1 auto;
+}
+
+.footer {
+    margin-top: 20px;
+    padding: 30px;
+}
+
+
+.footer-column {
+    border: none;
+    vertical-align: top;
 }

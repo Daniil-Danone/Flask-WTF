@@ -32,6 +32,22 @@
                     <div class="col-md-3" id="nothing">
                     </div>
 <!-------------------------------------------------------------------------------------------------------------------------------------------------------->
+                    <div class="col-md-6" id="job_describe">
+                        <label for="job_describe" class="form-label" id="job_describe"><b>Описание работы</b></label>
+                        {{ form.job_describe(class="form-control") }}
+                        {% for error in form.errors.job_describe %}
+                            <small class="form-text text-muted ">
+                                <font color="red">{{ ''.join(error) }}</font>
+                            </small>
+                         {% endfor %}
+                    </div>
+<!-------------------------------------------------------------------------------------------------------------------------------------------------------->
+                    <div class="col-md-3" id="nothing">
+                    </div>
+<!-------------------------------------------------------------------------------------------------------------------------------------------------------->
+                    <div class="col-md-3" id="nothing">
+                    </div>
+<!-------------------------------------------------------------------------------------------------------------------------------------------------------->
                     <div class="col-md-6" id="team_leader_id">
                         <label for="team_leader_id" class="form-label"><b>ID тим-лида</b><font color="red">*</font></label>
                         {{ form.team_leader_id(class="form-control") }}
@@ -97,7 +113,7 @@
                     </div>
 <!-------------------------------------------------------------------------------------------------------------------------------------------------------->
                     <div class="col-md-6" id="end_date">
-                        <label for="end_date" class="form-label"><b>Окончание работ</b><font color="red">*</font></label>
+                        <label for="end_date" class="form-label"><b>Окончание работ</b></label>
                         {{ form.end_date(class="form-control") }}
                         {% for error in form.errors.end_date %}
                             <small class="form-text text-muted ">

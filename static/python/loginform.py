@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, EmailField, RadioField, SelectField, SubmitField
+from wtforms import StringField, PasswordField, BooleanField, EmailField, RadioField, SelectField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired, Email, Length
 
 
@@ -84,6 +84,11 @@ class RegistrationForm(FlaskForm):
                           name='doctor',
                           render_kw={"value": "Врач"})
 
+    text = TextAreaField('Расскажите, почему Вы решили лететь на Марс? Одумайтесь, пока не поздно...',
+                         id='text',
+                         name='text',
+                         render_kw={"placeholder": "Введите текст..."})
+
     accept = BooleanField('Соглашение', validators=[DataRequired(message='Вы должны согласиться!')],
                           id='accept',
                           name='accept')
@@ -115,6 +120,12 @@ class CreateJob(FlaskForm):
                             name='job_title',
                             id='job_title',
                             render_kw={"placeholder": "Введите название работы..."})
+
+    job_describe = TextAreaField('Описание работы',
+                                 id='job_describe',
+                                 name='job_describe',
+                                 render_kw={"placeholder": "Опишите работу, что нужно делать сотрудникам..."})
+
     team_leader_id = StringField('ID тим-лида',
                                  validators=[DataRequired(message='Это поле должно быть заполнено!')],
                                  name='team_leader_id',

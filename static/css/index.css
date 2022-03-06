@@ -110,3 +110,8 @@
 .dropdown-navbar {
     padding-right: 40px;
 }
+
+.table {
+    margin-top: 30px;
+    word-wrap: break-word;
+}

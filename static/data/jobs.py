@@ -10,6 +10,7 @@ class Jobs(SqlAlchemyBase, UserMixin):
     id = sqlalchemy.Column(sqlalchemy.Integer,
                            primary_key=True, autoincrement=True)
     job_title = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    job_describe = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     team_leader = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
     work_size = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
     collaborators = sqlalchemy.Column(sqlalchemy.String, nullable=True)

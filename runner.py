@@ -152,6 +152,20 @@ def create_job():
                     break
             if collabs is True:
                 job.job_title = form.job_title.data
+                print(form.job_describe.data)
+                if len(form.job_describe.data) > 40:
+                    text = ''
+                    output_text = ''
+                    for i in form.job_describe.data.split():
+                        if len(i) + len(text) < 40:
+                            text = text + i + ' '
+                        else:
+                            output_text = output_text + text + '\n'
+                            text = i + " "
+                    output_text = output_text + text
+                    job.job_describe = output_text
+                else:
+                    job.job_describe = form.job_describe.data
                 job.team_leader = form.team_leader_id.data
                 job.work_size = form.work_size.data
                 job.collaborators = form.collaborators.data
@@ -171,6 +185,18 @@ def create_job():
                            form=form,
                            title='Создание работы',
                            menu_bar_title='Миссия колонизация Марса!')
+
+
+@app.route('/job_list', methods=['POST', 'GET'])
+def job_list():
+    html_file = 'html/job_list.html'
+    db_session.global_init("static/databases/my_site.db")
+    db_sess = db_session.create_session()
+    jobs = db_sess.query(Jobs).all()
+    return render_template(html_file,
+                           jobs=jobs,
+                           title='Список работ',
+                           menu_bar_title='Миссия колонизация Марса!', )
 
 
 @app.route('/profile/<email>', methods=['POST', 'GET'])

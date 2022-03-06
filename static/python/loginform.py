@@ -124,7 +124,7 @@ class CreateJob(FlaskForm):
                             validators=[DataRequired(message='Это поле должно быть заполнено!')],
                             name='work_size',
                             id='work_size',
-                            render_kw={"placeholder": "Введите количество часов ..."})
+                            render_kw={"placeholder": "Введите количество часов..."})
     collaborators = StringField('Сотрудники',
                                 validators=[DataRequired(message='Это поле должно быть заполнено!')],
                                 name='collaborators',

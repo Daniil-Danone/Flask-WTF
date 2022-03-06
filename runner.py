@@ -3,6 +3,7 @@ import sqlite3
 from datetime import datetime
 from static.data.users import User
 from static.data.crew import Crew
+from static.data.jobs import Jobs
 from static.data import db_session
 from flask_login import LoginManager, login_user, login_required, logout_user
 from static.other.professions import professions
@@ -25,7 +26,7 @@ user_info = {}
 
 @login_manager.user_loader
 def load_user(user_id):
-    db_session.global_init("static/databases/blogs.db")
+    db_session.global_init("static/databases/my_site.db")
     db_sess = db_session.create_session()
     return db_sess.query(User).get(user_id)
 
@@ -42,7 +43,7 @@ def default():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
-    db_session.global_init("static/databases/blogs.db")
+    db_session.global_init("static/databases/my_site.db")
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         user = db_sess.query(User).filter(User.email == form.email.data).first()
@@ -65,7 +66,7 @@ def logout():
 
 @app.route('/login_for_crew', methods=['GET', 'POST'])
 def login_for_crew():
-    db_session.global_init("static/databases/blogs.db")
+    db_session.global_init("static/databases/my_site.db")
     form = CrewLoginFormConfirm()
     if form.validate_on_submit():
         data = login_check_crew_db(request.form['id_captain'])
@@ -91,12 +92,12 @@ def login_for_crew():
 
 
 @app.route('/register', methods=['POST', 'GET'])
-def reg():
+def registration():
     html_file = "html/registration_form.html"
     form = RegistrationForm()
     user = User()
 
-    db_session.global_init("static/databases/blogs.db")
+    db_session.global_init("static/databases/my_site.db")
 
     if form.validate_on_submit():
         db_sess = db_session.create_session()
@@ -139,11 +140,33 @@ def reg():
 def create_job():
     html_file = "html/create_job.html"
     form = CreateJob()
+    job = Jobs()
+    db_session.global_init("static/databases/my_site.db")
     if form.validate_on_submit():
-        return render_template(html_file,
-                               form=form,
-                               title='Создание работы',
-                               menu_bar_title='Миссия колонизация Марса!')
+        db_sess = db_session.create_session()
+        if db_sess.query(User).filter(User.id == form.team_leader_id.data).first() or db_sess.query(Crew).filter(Crew.uniq_crew_id == form.team_leader_id.data).first():
+            collabs = True
+            for i in form.collaborators.data.split(', '):
+                if not db_sess.query(User).filter(User.id == i).first():
+                    collabs = False
+                    break
+            if collabs is True:
+                job.job_title = form.job_title.data
+                job.team_leader = form.team_leader_id.data
+                job.work_size = form.work_size.data
+                job.collaborators = form.collaborators.data
+                job.start_date = form.start_date.data
+                job.end_date = form.end_date.data
+                job.is_finished = form.is_finished.data
+                db_sess.add(job)
+                db_sess.commit()
+                return redirect('/')
+            else:
+                return render_template(html_file,
+                                       form=form,
+                                       title='Создание работы',
+                                       menu_bar_title='Миссия колонизация Марса!',
+                                       message='Что-то пошло не так!')
     return render_template(html_file,
                            form=form,
                            title='Создание работы',
@@ -152,7 +175,7 @@ def create_job():
 
 @app.route('/profile/<email>', methods=['POST', 'GET'])
 def answer(email):
-    db_session.global_init("static/databases/blogs.db")
+    db_session.global_init("static/databases/my_site.db")
     db_sess = db_session.create_session()
     user = db_sess.query(User).filter(User.email == email).first()
     html_file = 'html/auto_answer.html'
@@ -198,11 +221,10 @@ def list_professions(list_type):
 @app.route('/distribution/', methods=['POST', 'GET'])
 def distribution():
     html_file = "html/distribution.html"
-    db_session.global_init("static/databases/blogs.db")
+    db_session.global_init("static/databases/my_site.db")
     db_sess = db_session.create_session()
     data_members = [[user.surname, user.name, user.sex, user.email, user.studying, user.professions, user.about,
                      user.created_date] for user in db_sess.query(User).all()]
-    db_session.global_init("static/databases/blogs.db")
     db_sess = db_session.create_session()
     data_crew = [[user.surname, user.name, user.post, user.email, user.studying, user.professions, user.about,
                   user.created_date] for user in db_sess.query(Crew).all()]
@@ -212,7 +234,6 @@ def distribution():
                            menu_bar_title='Миссия колонизация Марса!',
                            rooms=[data_crew, data_members],
                            shift=len(data_crew))
-
 
 
 if __name__ == '__main__':

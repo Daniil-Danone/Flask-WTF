@@ -1,15 +1,13 @@
 import os
-import sqlite3
 from datetime import datetime
 from static.data.users import User
 from static.data.crew import Crew
 from static.data.jobs import Jobs
 from static.data import db_session
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from static.other.professions import professions
+from static.python.professions import professions
 from static.python.loginform import RegistrationForm, LoginForm, CrewLoginFormConfirm, CreateJob
 from flask import Flask, render_template, request, redirect, abort
-
 
 app = Flask(__name__)
 login_manager = LoginManager()
@@ -18,7 +16,7 @@ login_manager.init_app(app)
 
 imgFolder = os.path.join('static', 'img')
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
-#  app.config['UPLOAD_FOLDER'] = imgFolder   -  позже пригодится
+app.config['UPLOAD_FOLDER'] = imgFolder
 
 
 user_info = {}

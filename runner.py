@@ -5,7 +5,7 @@ from static.data.users import User
 from static.data import db_session
 from flask_login import LoginManager, login_user, login_required, logout_user
 from static.other.professions import professions
-from static.python.loginform import RegistrationForm, LoginForm, CrewLoginFormConfirm
+from static.python.loginform import RegistrationForm, LoginForm, CrewLoginFormConfirm, CreateJob
 from flask import Flask, render_template, request, redirect
 
 
@@ -47,7 +47,7 @@ def login():
         user = db_sess.query(User).filter(User.email == form.email.data).first()
         if user and user.check_password(form.password.data):
             login_user(user, remember=form.remember_me.data)
-            return redirect("/")
+            return redirect("/list_prof/ul")
         return render_template('html/login.html',
                                incorrect_password='Неправильный логин или пароль',
                                menu_bar_title='Миссия колонизация Марса!',
@@ -60,37 +60,6 @@ def login():
 def logout():
     logout_user()
     return redirect("/")
-
-
-'''@app.route('/login', methods=['GET', 'POST'])
-def login():
-    db_session.global_init("static/databases/blogs.db")
-    form = LoginForm()
-    if form.validate_on_submit():
-        db_sess = db_session.create_session()
-        if not db_sess.query(User).filter(User.email == request.form['email']).first():
-            return render_template('html/login.html',
-                                   title='Авторизация',
-                                   form=form,
-                                   incorrect_login='Аккаунта с таким логином не существует! '
-                                                   'Пожалуйста, проверьте правильность его ввода.',
-                                   menu_bar_title='Миссия колонизация Марса!')
-
-        else:
-            user = db_sess.query(User).filter(User.email == request.form['email']).first()
-            if user.check_password(request.form['password']):
-                return redirect(f'/profile/{request.form["email"]}')
-            else:
-                return render_template('html/login.html',
-                                       title='Авторизация',
-                                       form=form,
-                                       menu_bar_title='Миссия колонизация Марса!',
-                                       incorrect_password='Пароль введён неверно!')
-
-    return render_template('html/login.html',
-                           title='Авторизация',
-                           form=form,
-                           menu_bar_title='Миссия колонизация Марса!')'''
 
 
 @app.route('/login_for_crew', methods=['GET', 'POST'])
@@ -118,11 +87,6 @@ def login_for_crew():
                            title='Авторизация для членов экипажа',
                            menu_bar_title='Миссия колонизация Марса!',
                            form=form)
-
-
-@app.route('/success', methods=['GET', 'POST'])
-def success():
-    return 'Вход выполнен'
 
 
 @app.route('/register', methods=['POST', 'GET'])
@@ -167,6 +131,21 @@ def reg():
     return render_template(html_file,
                            form=form,
                            title='Регистрация',
+                           menu_bar_title='Миссия колонизация Марса!')
+
+
+@app.route('/create_job', methods=['POST', 'GET'])
+def create_job():
+    html_file = "html/create_job.html"
+    form = CreateJob()
+    if form.validate_on_submit():
+        return render_template(html_file,
+                               form=form,
+                               title='Создание работы',
+                               menu_bar_title='Миссия колонизация Марса!')
+    return render_template(html_file,
+                           form=form,
+                           title='Создание работы',
                            menu_bar_title='Миссия колонизация Марса!')
 
 

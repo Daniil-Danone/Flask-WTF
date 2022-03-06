@@ -109,6 +109,40 @@ class LoginForm(FlaskForm):
     submit_crew = SubmitField('Продолжить')
 
 
+class CreateJob(FlaskForm):
+    job_title = StringField('Название работы',
+                            validators=[DataRequired(message='Это поле должно быть заполнено!')],
+                            name='job_title',
+                            id='job_title',
+                            render_kw={"placeholder": "Введите название работы..."})
+    team_leader_id = StringField('ID тим-лида',
+                                 validators=[DataRequired(message='Это поле должно быть заполнено!')],
+                                 name='team_leader_id',
+                                 id='team_leader_id',
+                                 render_kw={"placeholder": "Введите ID тим-лида..."})
+    work_size = StringField('Объём работы (в часах)',
+                            validators=[DataRequired(message='Это поле должно быть заполнено!')],
+                            name='work_size',
+                            id='work_size',
+                            render_kw={"placeholder": "Введите количество часов ..."})
+    collaborators = StringField('Сотрудники',
+                                validators=[DataRequired(message='Это поле должно быть заполнено!')],
+                                name='collaborators',
+                                id='collaborators',
+                                render_kw={"placeholder": "Введите ID сотрудников через запятую..."})
+    start_date = StringField('Начало работ',
+                             validators=[DataRequired(message='Это поле должно быть заполнено!')],
+                             name='start_date',
+                             id='start_date',
+                             render_kw={"placeholder": "Введите дату начала работ..."})
+    end_date = StringField('Окончание работ',
+                           validators=[DataRequired(message='Это поле должно быть заполнено!')],
+                           name='end_date',
+                           id='end_date',
+                           render_kw={"placeholder": "Введите планируемую дату окончания работ..."})
+    is_finished = BooleanField('Работа окончена?')
+
+
 class CrewLoginFormConfirm(FlaskForm):
     id_captain = EmailField('ID капитана', validators=[DataRequired(message='Это поле должно быть заполнено!')],
                             name='id_captain',

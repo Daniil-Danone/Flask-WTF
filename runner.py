@@ -6,6 +6,7 @@ from static.data.jobs import Jobs
 from static.data import db_session
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from static.python.professions import professions
+from static.python.sources import images
 from static.python.loginform import RegistrationForm, LoginForm, CrewLoginFormConfirm, CreateJob
 from flask import Flask, render_template, request, redirect, abort
 
@@ -34,6 +35,7 @@ def default():
     html_file = 'html/index.html'
     return render_template(html_file,
                            title='Миссия колонизация Марса!',
+                           elon_musk_loves_anime=images['Elon Musk cat girl'],
                            menu_bar_title='Миссия колонизация Марса!',
                            professions=professions)
 

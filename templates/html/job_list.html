@@ -1,0 +1,41 @@
+{% extends "html/base.html" %}
+
+{% block content %}
+    <div class="startpage">
+        <div class="card-body-title">
+            <h3>Список работ</h3>
+        </div>
+        <table class="table">
+            <thead class="table-info">
+                <th scope="col">№</th>
+                <th scope="col">Название работы</th>
+                <th scope="col" class="col-lg-3">Описание работы</th>
+                <th scope="col">Тим-лид</th>
+                <th scope="col">Объём работ</th>
+                <th scope="col">Сотрудники</th>
+                <th scope="col">Начало работ</th>
+                <th scope="col">Окончание работ</th>
+                <th scope="col">Статус</th>
+            </thead>
+            <tbody>
+                {% for job in jobs %}
+                    <tr>
+                        <th scope="row" class="table-secondary align-middle"> {{ loop.index }}</th>
+                        <td class="align-middle">{{ job.job_title }}</td>
+                        <td class="table-secondary align-middle">{{ job.job_describe }}</td>
+                        <td class="align-middle">{{ job.team_leader }}</td>
+                        <td class="table-secondary align-middle">{{ job.work_size }}</td>
+                        <td class="align-middle">{{ job.collaborators }}</td>
+                        <td class="table-secondary align-middle">{{ job.start_date}}</td>
+                        <td class="align-middle">{{ job.end_date }}</td>
+                        {% if job.is_finished == 0 %}
+                            <td class="table-danger align-middle">В работе</td>
+                        {% else %}
+                            <td class="table-success align-middle">Выполнено</td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

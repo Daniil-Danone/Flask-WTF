@@ -1,4 +1,5 @@
 import os
+import yadisk
 from datetime import datetime
 from static.data.users import User
 from static.data.crew import Crew
@@ -8,16 +9,19 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from static.python.professions import professions
 from static.python.sources import images
 from static.python.loginform import RegistrationForm, LoginForm, CrewLoginFormConfirm, CreateJob
-from flask import Flask, render_template, request, redirect, abort
+from flask import Flask, render_template, request, redirect, abort, make_response, jsonify
 
 app = Flask(__name__)
 login_manager = LoginManager()
 login_manager.init_app(app)
 
 
-imgFolder = os.path.join('img')
+imgFolder = os.path.join('images')
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 app.config['UPLOAD_FOLDER'] = imgFolder
+
+
+disk = yadisk.YaDisk(token='AQAAAABAnEzFAAe8DKWJh_F-AEeRmOR1ZPKKXzc')
 
 
 user_info = {}
@@ -27,6 +31,11 @@ user_info = {}
 def load_user(user_id):
     db_sess = db_session.create_session()
     return db_sess.query(User).get(user_id)
+
+
+@app.errorhandler
+def not_found(error):
+    return make_response(jsonify({'error': 'Not found'}), 404)
 
 
 @app.route('/', methods=['POST', 'GET'])
@@ -121,6 +130,14 @@ def registration():
             user.about = request.form['text']
             user.set_password(request.form['password'])
             user.created_date = datetime.now().strftime('%a, %d %b %Y %H:%M:%S')
+            try:
+                image = form.avatar.data
+                filename = f'{user.email}.png'
+                image.save(f'{filename}')
+                disk.upload(filename, f"/Site-avatars/{filename}")
+                user.image_link = f"/Site-avatars/{filename}"
+            except:
+                user.image_link = f"/Site-avatars/error.png"
             db_sess = db_session.create_session()
             db_sess.add(user)
             db_sess.commit()

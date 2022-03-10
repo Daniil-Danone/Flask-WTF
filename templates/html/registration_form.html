@@ -7,7 +7,7 @@
     <div class="registration-form">
         <div class="card border-info registration-form-card">
             <div class="card-body">
-                <form class="row g-3" method="post" novalidate>
+                <form class="row g-3" method="post" novalidate enctype="multipart/form-data">
                     {{ form.hidden_tag() }}
                     <div>
                         {{ form.csrf_token }}
@@ -228,6 +228,24 @@
                         <div class="select-label">
                             <label for="about"><b>Расскажите, почему Вы решили лететь на Марс? Одумайтесь, пока не поздно...</b></label>
                             {{ form.text(class="form-control") }}
+                        </div>
+                    </div>
+<!-------------------------------------------------------------------------------------------------------------------------------------------------------->
+                    <div class="col-md-3" id="nothing">
+                    </div>
+<!-------------------------------------------------------------------------------------------------------------------------------------------------------->
+                    <div class="col-md-3" id="nothing">
+                    </div>
+<!-------------------------------------------------------------------------------------------------------------------------------------------------------->
+                    <div class="col-6">
+                        <div class="select-label">
+                            <label for="about"><b>Выберите фотографию для профиля</b></label>
+                            {{ form.avatar(class="form-control") }}
+                            {% for error in form.errors.avatar %}
+                                <small class="form-text text-muted ">
+                                    <font color="red">{{ ''.join(error) }}</font>
+                                </small>
+                            {% endfor %}
                         </div>
                     </div>
 <!-------------------------------------------------------------------------------------------------------------------------------------------------------->

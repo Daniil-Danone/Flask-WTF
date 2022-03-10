@@ -1,5 +1,6 @@
 import flask
-from flask import jsonify
+import sqlalchemy_serializer
+from flask import jsonify, request
 from . import db_session
 from .jobs import Jobs
 
@@ -11,11 +12,10 @@ blueprint = flask.Blueprint(
 )
 
 
-@blueprint.route('/api/jobs/')
-def get_news():
+@blueprint.route('/api/jobs', methods=['GET'])
+def get_all_news():
     db_sess = db_session.create_session()
     jobs = db_sess.query(Jobs).all()
-    print(jobs)
     if jobs:
         return jsonify(
             {
@@ -25,3 +25,35 @@ def get_news():
         )
     else:
         return jsonify({'error': 'Not found'})
+
+
+@blueprint.route('/api/jobs/<int:job_id>', methods=['GET'])
+def get_news(job_id):
+    try:
+        db_sess = db_session.create_session()
+        jobs = db_sess.query(Jobs).get(job_id)
+        if jobs:
+            return jsonify(
+                {
+                    'jobs':
+                        [jobs.to_dict()]
+                }
+            )
+        else:
+            return jsonify({'error': 'Not found'})
+    except:
+        return jsonify({'error': 'Not found'})
+
+
+@blueprint.route('/api/jobs', methods=['POST'])
+def create_news():
+    if not request.json:
+        return jsonify({'error': 'Empty request'})
+    elif not all(key in request.json for key in
+                 ['title']):
+        return jsonify({'error': 'Bad request'})
+    db_sess = db_session.create_session()
+    jobs = Jobs()
+    db_sess.add(jobs)
+    db_sess.commit()
+    return jsonify({'success': 'OK'})

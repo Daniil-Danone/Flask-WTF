@@ -1,6 +1,8 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, EmailField, RadioField, SelectField, SubmitField, TextAreaField
+from wtforms import StringField, PasswordField, BooleanField, EmailField, RadioField, SelectField, SubmitField, \
+    TextAreaField
 from wtforms.validators import DataRequired, Email, Length
+from flask_wtf.file import FileField, FileAllowed, FileRequired
 
 
 class RegistrationForm(FlaskForm):
@@ -83,6 +85,8 @@ class RegistrationForm(FlaskForm):
                           id='doctor',
                           name='doctor',
                           render_kw={"value": "Врач"})
+
+    avatar = FileField('Update profile picture', validators=[DataRequired(), FileAllowed(['png'])])
 
     text = TextAreaField('Расскажите, почему Вы решили лететь на Марс? Одумайтесь, пока не поздно...',
                          id='text',

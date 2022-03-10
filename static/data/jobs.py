@@ -1,10 +1,11 @@
 import sqlalchemy
+from sqlalchemy_serializer import SerializerMixin
 from flask_login import UserMixin
 from .db_session import SqlAlchemyBase
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
-class Jobs(SqlAlchemyBase, UserMixin):
+class Jobs(SqlAlchemyBase, UserMixin, SerializerMixin):
     __tablename__ = 'jobs'
 
     id = sqlalchemy.Column(sqlalchemy.Integer,

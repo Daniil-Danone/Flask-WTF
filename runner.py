@@ -3,7 +3,7 @@ from datetime import datetime
 from static.data.users import User
 from static.data.crew import Crew
 from static.data.jobs import Jobs
-from static.data import db_session
+from static.data import db_session, jobs_api
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from static.python.professions import professions
 from static.python.sources import images
@@ -15,7 +15,7 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 
-imgFolder = os.path.join('static', 'img')
+imgFolder = os.path.join('img')
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 app.config['UPLOAD_FOLDER'] = imgFolder
 
@@ -25,15 +25,13 @@ user_info = {}
 
 @login_manager.user_loader
 def load_user(user_id):
-    db_session.global_init("static/databases/my_site.db")
     db_sess = db_session.create_session()
     return db_sess.query(User).get(user_id)
 
 
 @app.route('/', methods=['POST', 'GET'])
 def default():
-    html_file = 'html/index.html'
-    return render_template(html_file,
+    return render_template('html/index.html',
                            title='Миссия колонизация Марса!',
                            elon_musk_loves_anime=images['Elon Musk cat girl'],
                            menu_bar_title='Миссия колонизация Марса!',
@@ -43,7 +41,6 @@ def default():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
-    db_session.global_init("static/databases/my_site.db")
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         user = db_sess.query(User).filter(User.email == form.email.data).first()
@@ -66,7 +63,6 @@ def logout():
 
 @app.route('/login_for_crew', methods=['GET', 'POST'])
 def login_for_crew():
-    db_session.global_init("static/databases/my_site.db")
     form = CrewLoginFormConfirm()
     if form.validate_on_submit():
         data = login_check_crew_db(request.form['id_captain'])
@@ -93,16 +89,13 @@ def login_for_crew():
 
 @app.route('/register', methods=['POST', 'GET'])
 def registration():
-    html_file = "html/registration_form.html"
     form = RegistrationForm()
     user = User()
-
-    db_session.global_init("static/databases/my_site.db")
 
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         if db_sess.query(User).filter(User.email == form.email.data).first():
-            return render_template(html_file,
+            return render_template("html/registration_form.html",
                                    form=form,
                                    title='Регистрация',
                                    menu_bar_title='Миссия колонизация Марса!',
@@ -130,7 +123,7 @@ def registration():
             db_sess.commit()
             return redirect(f'/profile/{user.email}')
 
-    return render_template(html_file,
+    return render_template("html/registration_form.html",
                            form=form,
                            title='Регистрация',
                            menu_bar_title='Миссия колонизация Марса!')
@@ -139,10 +132,8 @@ def registration():
 @app.route('/create_job', methods=['POST', 'GET'])
 @login_required
 def create_job():
-    html_file = "html/create_job.html"
     form = CreateJob()
     job = Jobs()
-    db_session.global_init("static/databases/my_site.db")
 
     if form.validate_on_submit():
         db_sess = db_session.create_session()
@@ -180,13 +171,13 @@ def create_job():
                 db_sess.commit()
                 return redirect('/job_list')
             else:
-                return render_template(html_file,
+                return render_template("html/create_job.html",
                                        form=form,
                                        card_title='Создание работы',
                                        title='Создание работы',
                                        menu_bar_title='Миссия колонизация Марса!',
                                        message='Что-то пошло не так!')
-    return render_template(html_file,
+    return render_template("html/create_job.html",
                            form=form,
                            card_title='Создание работы',
                            title='Создание работы',
@@ -196,7 +187,6 @@ def create_job():
 @app.route('/edit_job/<int:id>', methods=['POST', 'GET'])
 def edit_job(id):
     form = CreateJob()
-    html_file = "html/create_job.html"
     job = Jobs()
     if request.method == "GET":
         db_sess = db_session.create_session()
@@ -253,13 +243,13 @@ def edit_job(id):
                 db_sess.commit()
                 return redirect('/job_list')
             else:
-                return render_template(html_file,
+                return render_template('html/create_job.html',
                                        form=form,
                                        card_title='Создание работы',
                                        title='Создание работы',
                                        menu_bar_title='Миссия колонизация Марса!',
                                        message='Что-то пошло не так!')
-    return render_template(html_file,
+    return render_template('html/create_job.html',
                            form=form,
                            card_title='Изменение работы',
                            title='Создание работы',
@@ -283,11 +273,9 @@ def news_delete(id):
 
 @app.route('/job_list', methods=['POST', 'GET'])
 def job_list():
-    html_file = 'html/job_list.html'
-    db_session.global_init("static/databases/my_site.db")
     db_sess = db_session.create_session()
     jobs = db_sess.query(Jobs).all()
-    return render_template(html_file,
+    return render_template('html/job_list.html',
                            jobs=jobs,
                            title='Список работ',
                            menu_bar_title='Миссия колонизация Марса!', )
@@ -295,11 +283,9 @@ def job_list():
 
 @app.route('/profile/<email>', methods=['POST', 'GET'])
 def answer(email):
-    db_session.global_init("static/databases/my_site.db")
     db_sess = db_session.create_session()
     user = db_sess.query(User).filter(User.email == email).first()
-    html_file = 'html/auto_answer.html'
-    return render_template(html_file,
+    return render_template('html/auto_answer.html',
                            title='Профиль',
                            params=user,
                            menu_bar_title='Миссия колонизация Марса!', )
@@ -308,8 +294,7 @@ def answer(email):
 @app.route('/training/<prof>', methods=['POST', 'GET'])
 def professions_training(prof):
     if request.method == 'GET':
-        html_file = 'html/training_professions.html'
-        return render_template(html_file,
+        return render_template('html/training_professions.html',
                                title=prof,
                                prof=prof,
                                menu_bar_title='Миссия колонизация Марса!',
@@ -323,15 +308,14 @@ def professions_training(prof):
 
 @app.route('/list_prof/<list_type>', methods=['POST', 'GET'])
 def list_professions(list_type):
-    html_file = "html/list_prof.html"
     if list_type == 'ol':
-        return render_template(html_file,
+        return render_template("html/list_prof.html",
                                title='Список профессий',
                                type_list='ol',
                                menu_bar_title='Миссия колонизация Марса!',
                                professions=professions)
     elif list_type == 'ul':
-        return render_template(html_file,
+        return render_template("html/list_prof.html",
                                title='Список профессий',
                                type_list='ul',
                                menu_bar_title='Миссия колонизация Марса!',
@@ -340,8 +324,6 @@ def list_professions(list_type):
 
 @app.route('/distribution/', methods=['POST', 'GET'])
 def distribution():
-    html_file = "html/distribution.html"
-    db_session.global_init("static/databases/my_site.db")
     db_sess = db_session.create_session()
     data_members = [[user.surname, user.name, user.sex, user.email, user.studying, user.professions, user.about,
                      user.created_date] for user in db_sess.query(User).all()]
@@ -349,7 +331,7 @@ def distribution():
     data_crew = [[user.surname, user.name, user.post, user.email, user.studying, user.professions, user.about,
                   user.created_date] for user in db_sess.query(Crew).all()]
 
-    return render_template(html_file,
+    return render_template("html/distribution.html",
                            title='Список профессий',
                            menu_bar_title='Миссия колонизация Марса!',
                            rooms=[data_crew, data_members],
@@ -357,4 +339,6 @@ def distribution():
 
 
 if __name__ == '__main__':
+    db_session.global_init("static/databases/my_site.db")
+    app.register_blueprint(jobs_api.blueprint)
     app.run(port=8080, host='127.0.0.1', debug=True)

@@ -51,7 +51,10 @@ def login():
                                incorrect_password='Неправильный логин или пароль',
                                menu_bar_title='Миссия колонизация Марса!',
                                form=form)
-    return render_template('html/login.html', title='Авторизация', form=form, menu_bar_title='Миссия колонизация Марса!')
+    return render_template('html/login.html',
+                           title='Авторизация',
+                           form=form,
+                           menu_bar_title='Миссия колонизация Марса!')
 
 
 @app.route('/logout')
@@ -137,7 +140,8 @@ def create_job():
 
     if form.validate_on_submit():
         db_sess = db_session.create_session()
-        if db_sess.query(User).filter(User.id == form.team_leader_id.data).first() or db_sess.query(Crew).filter(Crew.uniq_crew_id == form.team_leader_id.data).first():
+        if db_sess.query(User).filter(User.id == form.team_leader_id.data).first() or \
+                db_sess.query(Crew).filter(Crew.uniq_crew_id == form.team_leader_id.data).first():
             collabs = True
             for i in form.collaborators.data.split(', '):
                 if not db_sess.query(User).filter(User.id == i).first():
@@ -184,13 +188,12 @@ def create_job():
                            menu_bar_title='Миссия колонизация Марса!')
 
 
-@app.route('/edit_job/<int:id>', methods=['POST', 'GET'])
-def edit_job(id):
+@app.route('/edit_job/<int:id_num>', methods=['POST', 'GET'])
+def edit_job(id_num):
     form = CreateJob()
-    job = Jobs()
     if request.method == "GET":
         db_sess = db_session.create_session()
-        job = db_sess.query(Jobs).filter(Jobs.id == id,
+        job = db_sess.query(Jobs).filter(Jobs.id == id_num,
                                          Jobs.creator == current_user.id
                                          ).first()
         if job:
@@ -256,11 +259,11 @@ def edit_job(id):
                            menu_bar_title='Миссия колонизация Марса!')
 
 
-@app.route('/job_delete/<int:id>', methods=['GET', 'POST'])
+@app.route('/job_delete/<int:id_num>', methods=['GET', 'POST'])
 @login_required
-def news_delete(id):
+def news_delete(id_num):
     db_sess = db_session.create_session()
-    job = db_sess.query(Jobs).filter(Jobs.id == id,
+    job = db_sess.query(Jobs).filter(Jobs.id == id_num,
                                      Jobs.creator == current_user.id
                                      ).first()
     if job:

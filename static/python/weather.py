@@ -2,7 +2,7 @@ import bs4
 import requests
 
 
-def _get_weather():
+def get_weather():
     url = "https://sinoptik.com.ru/pogoda/omsk"
     page = requests.get(url)
     soup = bs4.BeautifulSoup(page.text, "html.parser")

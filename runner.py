@@ -1,19 +1,21 @@
 import os
-from PIL import Image
 import yadisk
 import requests
-from urllib.parse import urlencode
 from datetime import datetime
-from static.data.users import User
 from static.data.crew import Crew
 from static.data.jobs import Jobs
+from static.data.users import User
 from static.data import db_session, jobs_api
-from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from static.python.professions import professions
+from flask_login import LoginManager, login_user, \
+    login_required, logout_user, current_user
 from static.python.sources import images
-from static.python.weather import _get_weather
-from static.python.loginform import RegistrationForm, LoginForm, CrewLoginFormConfirm, CreateJob
-from flask import Flask, render_template, request, redirect, abort, make_response, jsonify
+from static.python.weather import get_weather
+from static.python.professions import professions
+from static.python.loginform import RegistrationForm, \
+    LoginForm, CrewLoginFormConfirm, CreateJob
+from flask import Flask, render_template, request, \
+    redirect, abort, make_response, jsonify
+
 
 app = Flask(__name__)
 login_manager = LoginManager()
@@ -25,10 +27,9 @@ app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 app.config['UPLOAD_FOLDER'] = imgFolder
 
 
-disk = yadisk.YaDisk(token='AQAAAABAnEzFAAe8DKWJh_F-AEeRmOR1ZPKKXzc')
+yandex_disk_token = os.environ.get('yandex_disk_API')
+disk = yadisk.YaDisk(token=yandex_disk_token)
 
-
-user_info = {}
 
 image = None
 
@@ -40,7 +41,7 @@ def load_user(user_id):
 
 
 @app.errorhandler
-def not_found(error):
+def not_found():
     return make_response(jsonify({'error': 'Not found'}), 404)
 
 
@@ -63,7 +64,7 @@ def load_profile():
 
 @app.route('/homepage', methods=['POST', 'GET'])
 def default():
-    weather = _get_weather()
+    weather = get_weather()
     date = datetime.now().strftime('%d %b %Y %H:%M:%S')
     return render_template('html/index.html',
                            image=image,
@@ -137,6 +138,7 @@ def login_for_crew():
                                    menu_bar_title='Миссия колонизация Марса!',
                                    incorrect_login_cap='ID неверен!')
     return render_template('html/login_for_crew.html',
+                           image=image,
                            title='Авторизация для членов экипажа',
                            menu_bar_title='Миссия колонизация Марса!',
                            form=form)
@@ -278,7 +280,8 @@ def edit_job(id_num):
         job = db_sess.query(Jobs).filter(Jobs.id == id_num,
                                          Jobs.creator == current_user.id
                                          ).first()
-        if db_sess.query(User).filter(User.id == form.team_leader_id.data).first() or db_sess.query(Crew).filter(Crew.uniq_crew_id == form.team_leader_id.data).first():
+        if db_sess.query(User).filter(User.id == form.team_leader_id.data).first() or \
+                db_sess.query(Crew).filter(Crew.uniq_crew_id == form.team_leader_id.data).first():
             collabs = True
             for i in form.collaborators.data.split(', '):
                 if not db_sess.query(User).filter(User.id == i).first():

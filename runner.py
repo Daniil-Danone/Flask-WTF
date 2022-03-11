@@ -1,5 +1,8 @@
 import os
+from PIL import Image
 import yadisk
+import requests
+from urllib.parse import urlencode
 from datetime import datetime
 from static.data.users import User
 from static.data.crew import Crew
@@ -8,6 +11,7 @@ from static.data import db_session, jobs_api
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from static.python.professions import professions
 from static.python.sources import images
+from static.python.weather import _get_weather
 from static.python.loginform import RegistrationForm, LoginForm, CrewLoginFormConfirm, CreateJob
 from flask import Flask, render_template, request, redirect, abort, make_response, jsonify
 
@@ -16,7 +20,7 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 
-imgFolder = os.path.join('images')
+imgFolder = os.path.join('static')
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 app.config['UPLOAD_FOLDER'] = imgFolder
 
@@ -25,6 +29,8 @@ disk = yadisk.YaDisk(token='AQAAAABAnEzFAAe8DKWJh_F-AEeRmOR1ZPKKXzc')
 
 
 user_info = {}
+
+image = None
 
 
 @login_manager.user_loader
@@ -38,9 +44,32 @@ def not_found(error):
     return make_response(jsonify({'error': 'Not found'}), 404)
 
 
-@app.route('/', methods=['POST', 'GET'])
+@app.route('/')
+def load_profile():
+    try:
+        global image
+        if current_user.image_link:
+            os.remove(f'static/images/avatars/avatar{current_user.id}.png')
+            request = requests.get(current_user.image_link)
+            with open(f'static/images/avatars/avatar{current_user.id}.png', 'wb') as f:
+                f.write(request.content)
+                print(f.name)
+            image = f'/images/avatars/avatar{current_user.id}.png'
+            return redirect('/homepage')
+        return redirect('/homepage')
+    except:
+        return redirect('/homepage')
+
+
+@app.route('/homepage', methods=['POST', 'GET'])
 def default():
+    weather = _get_weather()
+    date = datetime.now().strftime('%d %b %Y %H:%M:%S')
     return render_template('html/index.html',
+                           image=image,
+                           weather=weather,
+                           date=date,
+                           weather_image=images['weathering with you'],
                            title='Миссия колонизация Марса!',
                            elon_musk_loves_anime=images['Elon Musk cat girl'],
                            menu_bar_title='Миссия колонизация Марса!',
@@ -49,26 +78,38 @@ def default():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    global image
     form = LoginForm()
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         user = db_sess.query(User).filter(User.email == form.email.data).first()
         if user and user.check_password(form.password.data):
             login_user(user, remember=form.remember_me.data)
-            return redirect("/")
+            if user.image_link:
+                request = requests.get(user.image_link)
+                with open(f'static/images/avatars/avatar{user.id}.png', 'wb') as f:
+                    f.write(request.content)
+                    print(f.name)
+                image = f'/images/avatars/avatar{user.id}.png'
+
+            return redirect("/homepage")
         return render_template('html/login.html',
+                               image=image,
                                incorrect_password='Неправильный логин или пароль',
                                menu_bar_title='Миссия колонизация Марса!',
                                form=form)
     return render_template('html/login.html',
                            title='Авторизация',
                            form=form,
+                           image=image,
                            menu_bar_title='Миссия колонизация Марса!')
 
 
 @app.route('/logout')
 @login_required
 def logout():
+    if current_user.image_link:
+        os.remove(f'static/images/avatars/avatar{current_user.id}.png')
     logout_user()
     return redirect("/")
 
@@ -85,12 +126,14 @@ def login_for_crew():
                 return render_template('html/login_for_crew.html',
                                        title='Авторизация для членов экипажа',
                                        form=form,
+                                       image=image,
                                        menu_bar_title='Миссия колонизация Марса!',
                                        incorrect_password_cap='Пароль введён неверно!')
         else:
             return render_template('html/login_for_crew.html',
                                    title='Авторизация для членов экипажа',
                                    form=form,
+                                   image=image,
                                    menu_bar_title='Миссия колонизация Марса!',
                                    incorrect_login_cap='ID неверен!')
     return render_template('html/login_for_crew.html',
@@ -131,13 +174,15 @@ def registration():
             user.set_password(request.form['password'])
             user.created_date = datetime.now().strftime('%a, %d %b %Y %H:%M:%S')
             try:
-                image = form.avatar.data
+                img = form.avatar.data
                 filename = f'{user.email}.png'
-                image.save(f'{filename}')
+                img.save(f'{filename}')
                 disk.upload(filename, f"/Site-avatars/{filename}")
-                user.image_link = f"/Site-avatars/{filename}"
+                disk.publish(f"/Site-avatars/{filename}")
+                user.image_link = disk.get_download_link(f"/Site-avatars/{filename}")
+                os.remove(filename)
             except:
-                user.image_link = f"/Site-avatars/error.png"
+                pass
             db_sess = db_session.create_session()
             db_sess.add(user)
             db_sess.commit()
@@ -194,12 +239,14 @@ def create_job():
             else:
                 return render_template("html/create_job.html",
                                        form=form,
+                                       image=image,
                                        card_title='Создание работы',
                                        title='Создание работы',
                                        menu_bar_title='Миссия колонизация Марса!',
                                        message='Что-то пошло не так!')
     return render_template("html/create_job.html",
                            form=form,
+                           image=image,
                            card_title='Создание работы',
                            title='Создание работы',
                            menu_bar_title='Миссия колонизация Марса!')
@@ -228,7 +275,7 @@ def edit_job(id_num):
     if form.validate_on_submit():
         print('OK')
         db_sess = db_session.create_session()
-        job = db_sess.query(Jobs).filter(Jobs.id == id,
+        job = db_sess.query(Jobs).filter(Jobs.id == id_num,
                                          Jobs.creator == current_user.id
                                          ).first()
         if db_sess.query(User).filter(User.id == form.team_leader_id.data).first() or db_sess.query(Crew).filter(Crew.uniq_crew_id == form.team_leader_id.data).first():
@@ -265,12 +312,14 @@ def edit_job(id_num):
             else:
                 return render_template('html/create_job.html',
                                        form=form,
+                                       image=image,
                                        card_title='Создание работы',
                                        title='Создание работы',
                                        menu_bar_title='Миссия колонизация Марса!',
                                        message='Что-то пошло не так!')
     return render_template('html/create_job.html',
                            form=form,
+                           image=image,
                            card_title='Изменение работы',
                            title='Создание работы',
                            menu_bar_title='Миссия колонизация Марса!')
@@ -297,6 +346,7 @@ def job_list():
     jobs = db_sess.query(Jobs).all()
     return render_template('html/job_list.html',
                            jobs=jobs,
+                           image=image,
                            title='Список работ',
                            menu_bar_title='Миссия колонизация Марса!', )
 
@@ -305,8 +355,10 @@ def job_list():
 def answer(email):
     db_sess = db_session.create_session()
     user = db_sess.query(User).filter(User.email == email).first()
+
     return render_template('html/auto_answer.html',
                            title='Профиль',
+                           image=image,
                            params=user,
                            menu_bar_title='Миссия колонизация Марса!', )
 
@@ -317,6 +369,7 @@ def professions_training(prof):
         return render_template('html/training_professions.html',
                                title=prof,
                                prof=prof,
+                               image=image,
                                menu_bar_title='Миссия колонизация Марса!',
                                bar_back_href='/list_prof/ol',
                                bar_back_title='←Назад',
@@ -332,12 +385,14 @@ def list_professions(list_type):
         return render_template("html/list_prof.html",
                                title='Список профессий',
                                type_list='ol',
+                               image=image,
                                menu_bar_title='Миссия колонизация Марса!',
                                professions=professions)
     elif list_type == 'ul':
         return render_template("html/list_prof.html",
                                title='Список профессий',
                                type_list='ul',
+                               image=image,
                                menu_bar_title='Миссия колонизация Марса!',
                                professions=professions)
 
@@ -353,6 +408,7 @@ def distribution():
 
     return render_template("html/distribution.html",
                            title='Список профессий',
+                           image=image,
                            menu_bar_title='Миссия колонизация Марса!',
                            rooms=[data_crew, data_members],
                            shift=len(data_crew))

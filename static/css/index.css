@@ -221,3 +221,32 @@ main {
     border: none;
     vertical-align: top;
 }
+
+.profile-card {
+    margin: 20px;
+    border: none;
+}
+
+.profile-card-img {
+    margin-top: 10px;
+    border: 2px solid #86b7fe;
+    border-radius: 3px;
+}
+
+.miniature-pic {
+    margin-top: 1px;
+    border: none;
+    image-rendering: auto;
+    width: 35px;
+    height: 35px;
+    object-fit: cover;
+}
+
+.weather-text {
+    margin: 5px;
+}
+
+.info-weather-date {
+    margin-top: 20px;
+    border-top: 1px solid #86b7fe;
+}

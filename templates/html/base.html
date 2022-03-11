@@ -26,7 +26,7 @@
     <header>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark text-white">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/">{{ menu_bar_title }}</a>
+            <a class="navbar-brand" href="/homepage">{{ menu_bar_title }}</a>
             <button class="navbar-toggler"
                     type="button"
                     data-bs-toggle="collapse"
@@ -39,7 +39,7 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link" aria-current="page" href="/">Home</a>
+                        <a class="nav-link" aria-current="page" href="/homepage">Home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/distribution">Схема размещения</a>
@@ -57,14 +57,28 @@
                 </ul>
 
                 {% if current_user.is_authenticated %}
-                    <div class="dropdown-navbar">
+                    <div class="dropdown-navbar user-navbar">
                         <div class="btn-group">
-                            <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false" id="user">{{ current_user.name }}</button>
+                            <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown"
+                                    href="#" role="button" aria-expanded="false" id="user">
+                                <span>
+                                    {% if image %}
+                                        <img src="{{ url_for('static', filename=image) }}"
+                                             class="img-fluid rounded-start profile-card-img miniature-pic"
+                                             alt="">
+                                    {% else %}
+                                        <img src="{{ url_for('static', filename='/images/avatars/no_avatar.png') }}"
+                                             class="img-fluid rounded-start profile-card-img miniature-pic"
+                                             alt="">
+                                    {% endif %}
+                                </span>
+                                {{ current_user.name }}
+                            </button>
                             <ul class="dropdown-menu">
                                 <li><h6 class="dropdown-header">{{ current_user.name }} {{ current_user.surname }}</h6></li>
                                 <li><a class="dropdown-item" href="/profile/{{ current_user.email }}">Профиль</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="/">Настройки</a></li>
+                                <li><a class="dropdown-item" href="/homepage">Настройки</a></li>
                                 <li><a class="dropdown-item" href="/logout">Выйти</a></li>
                             </ul>
                         </div>
@@ -92,7 +106,7 @@
             <form class="form-footer" method="post" novalidate>
                 <ul class="list-group list-group-flush bg-dark">
                     <li class="list-group-item bg-dark">
-                        <a class="nav-link" aria-current="page" href="/">Home</a>
+                        <a class="nav-link" aria-current="page" href="/homepage">Home</a>
                     </li>
 
                     <li class="list-group-item bg-dark">

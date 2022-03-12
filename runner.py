@@ -1,5 +1,5 @@
 import os
-
+from PIL import Image
 import flask_login
 import yadisk
 import requests
@@ -76,12 +76,16 @@ def load_profile():
 @app.route('/homepage', methods=['POST', 'GET'])
 def default():
     weather = get_weather()
+    if weather[5] < 0:
+        weather_image = images['5cm per second - snow']
+    else:
+        weather_image = images['weathering with you']
     date = datetime.now().strftime('%d %b %Y %H:%M:%S')
     return render_template('html/index.html',
                            image=image,
                            weather=weather,
                            date=date,
-                           weather_image=images['weathering with you'],
+                           weather_image=weather_image,
                            title='Миссия колонизация Марса!',
                            elon_musk_loves_anime=images['Elon Musk cat girl'],
                            menu_bar_title='Миссия колонизация Марса!',
@@ -190,11 +194,16 @@ def registration():
                 img = form.avatar.data
                 filename = f'{user.email}.png'
                 img.save(f'{filename}')
-                disk.upload(filename, f"/Site-avatars/{filename}")
+                image = Image.open(filename)
+                h, w = image.size
+                scale = 200 / max(h, w)
+                image.resize((int(h * scale), int(w * scale)), Image.ANTIALIAS).save("resized.png")
+                disk.upload('resized.png', f"/Site-avatars/{filename}")
                 disk.publish(f"/Site-avatars/{filename}")
                 user.image_link = disk.get_download_link(f"/Site-avatars/{filename}")
                 user.disk_path = f"/Site-avatars/{filename}"
                 os.remove(filename)
+                os.remove('resized.png')
             except:
                 pass
             db_sess = db_session.create_session()

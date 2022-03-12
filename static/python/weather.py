@@ -30,4 +30,4 @@ def get_weather():
     else:
         advice = 'Сегодня очень жарко🔥 , можно пойти на пляж⛱!'
 
-    return today, day, temperature, temperature_value, advice
+    return today, day, temperature, temperature_value, advice, t

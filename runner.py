@@ -27,8 +27,8 @@ app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 app.config['UPLOAD_FOLDER'] = imgFolder
 
 
-yandex_disk_token = os.environ.get('yandex_disk_API')
-disk = yadisk.YaDisk(token=yandex_disk_token)
+'''yandex_disk_token = os.environ.get('yandex_disk_API')'''
+disk = yadisk.YaDisk(token='AQAAAABAnEzFAAe8DKWJh_F-AEeRmOR1ZPKKXzc')
 
 
 image = None
@@ -49,13 +49,22 @@ def not_found():
 def load_profile():
     try:
         global image
-        if current_user.image_link:
-            os.remove(f'static/images/avatars/avatar{current_user.id}.png')
-            request = requests.get(current_user.image_link)
+        db_sess = db_session.create_session()
+        user = db_sess.query(User).filter(User.id == current_user.id).first()
+        if user.disk_path:
+            disk.unpublish(user.disk_path)
+            disk.publish(user.disk_path)
+            user.image_link = disk.get_download_link(user.disk_path)                 # получаю новую ссылку на скачивание изображения
+            db_sess.commit()
+
+            os.remove(f'static/images/avatars/avatar{current_user.id}.png')          # удаляю прежний аватар из "временного хранилища"
+            request = requests.get(current_user.image_link)                          # получаю данные аватара через запрос по сгенерировавшейся выше ссылке
+
             with open(f'static/images/avatars/avatar{current_user.id}.png', 'wb') as f:
-                f.write(request.content)
-                print(f.name)
-            image = f'/images/avatars/avatar{current_user.id}.png'
+                f.write(request.content)                                             # записываю аватар во "временное хранилище"
+
+            image = f'/images/avatars/avatar{current_user.id}.png'                   # назначаю путь к данному файлу на сервере
+
             return redirect('/homepage')
         return redirect('/homepage')
     except:
@@ -93,7 +102,7 @@ def login():
                     print(f.name)
                 image = f'/images/avatars/avatar{user.id}.png'
 
-            return redirect("/homepage")
+            return redirect("/")
         return render_template('html/login.html',
                                image=image,
                                incorrect_password='Неправильный логин или пароль',
@@ -110,7 +119,7 @@ def login():
 @login_required
 def logout():
     if current_user.image_link:
-        os.remove(f'static/images/avatars/avatar{current_user.id}.png')
+        os.remove(f'static/images/avatars/avatar{current_user.id}.png')                 # удаляю аватар из "временного хранилища" сервера
     logout_user()
     return redirect("/")
 
@@ -182,13 +191,14 @@ def registration():
                 disk.upload(filename, f"/Site-avatars/{filename}")
                 disk.publish(f"/Site-avatars/{filename}")
                 user.image_link = disk.get_download_link(f"/Site-avatars/{filename}")
+                user.disk_path = f"/Site-avatars/{filename}"
                 os.remove(filename)
             except:
                 pass
             db_sess = db_session.create_session()
             db_sess.add(user)
             db_sess.commit()
-            return redirect(f'/profile/{user.email}')
+            return redirect('/')
 
     return render_template("html/registration_form.html",
                            form=form,

@@ -66,7 +66,18 @@
                         <p class="card-text weather-text">{{ weather[4] }}</p>
                     </small>
                 </div>
-                <img src="{{ weather_image }}" alt="О нет, Илон Маск пропал!">
+                <img src="{{ weather_image }}" alt="О нет, погоды нет!">
+            </div>
+            <div class="card border-info weather-index-page">
+                <div class="card-body">
+                    <h5 class="card-title news-title">Случайная шутка про Штирлица!</h5>
+                    <small>
+                        {% for i in joke %}
+                            <p class="card-text weather-text">{{ i }}</p>
+                        {% endfor %}
+                    </small>
+                </div>
+                <img src="../../static/images/laugh.jpg" alt="О нет, Штирлиц исчез!">
             </div>
         </div>
 <!-------------------------------------------------------------------------------------------------------------------------------------------------------->

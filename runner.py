@@ -1,13 +1,15 @@
 import os
+import random
+
 from PIL import Image
-import flask_login
 import yadisk
 import requests
 from datetime import datetime
 from static.data.crew import Crew
 from static.data.jobs import Jobs
 from static.data.users import User
-from static.data import db_session, jobs_api
+from static.other.jokes import jokes_list
+from static.data import db_session, users_resource
 from flask_login import LoginManager, login_user, \
     login_required, logout_user, current_user
 from static.python.sources import images
@@ -17,9 +19,10 @@ from static.python.loginform import RegistrationForm, \
     LoginForm, CrewLoginFormConfirm, CreateJob
 from flask import Flask, render_template, request, \
     redirect, abort, make_response, jsonify
-
+from flask_restful import abort, Api
 
 app = Flask(__name__)
+api = Api(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 
@@ -29,8 +32,8 @@ app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 app.config['UPLOAD_FOLDER'] = imgFolder
 
 
-'''yandex_disk_token = os.environ.get('yandex_disk_API')'''
-disk = yadisk.YaDisk(token='AQAAAABAnEzFAAe8DKWJh_F-AEeRmOR1ZPKKXzc')
+yandex_disk_token = os.environ.get('YANDEX_DISK_API')
+disk = yadisk.YaDisk(token=yandex_disk_token)
 
 
 image = None
@@ -57,6 +60,8 @@ def load_profile():
             disk.unpublish(user.disk_path)
             disk.publish(user.disk_path)
             user.image_link = disk.get_download_link(user.disk_path)                 # получаю новую ссылку на скачивание изображения
+            print(user.disk_path)
+            print(user.image_link)
             db_sess.commit()
 
             os.remove(f'static/images/avatars/avatar{current_user.id}.png')          # удаляю прежний аватар из "временного хранилища"
@@ -77,17 +82,24 @@ def load_profile():
 def default():
     weather = get_weather()
     if weather[5] < 0:
-        weather_image = images['5cm per second - snow']
+        weather_image = images['5cm per second - snow'][random.randint(0, 1)]
+    elif 20 < weather[5] < 30:
+        weather_image = images['your name - sunny']
     else:
         weather_image = images['weathering with you']
+
     date = datetime.now().strftime('%d %b %Y %H:%M:%S')
+
+    joke = jokes_list[random.randrange(len(jokes_list))].split('\n')
+
     return render_template('html/index.html',
                            image=image,
                            weather=weather,
                            date=date,
+                           joke=joke,
                            weather_image=weather_image,
                            title='Миссия колонизация Марса!',
-                           elon_musk_loves_anime=images['Elon Musk cat girl'],
+                           elon_musk_loves_anime=images['Elon Musk with cat girl'],
                            menu_bar_title='Миссия колонизация Марса!',
                            professions=professions)
 
@@ -380,8 +392,8 @@ def answer(email):
     db_sess = db_session.create_session()
     user = db_sess.query(User).filter(User.email == email).first()
 
-    return render_template('html/auto_answer.html',
-                           title='Профиль',
+    return render_template('html/profile.html',
+                           title=f'{user.name} - DanoNET',
                            image=image,
                            params=user,
                            menu_bar_title='Миссия колонизация Марса!', )
@@ -440,5 +452,6 @@ def distribution():
 
 if __name__ == '__main__':
     db_session.global_init("static/databases/my_site.db")
-    app.register_blueprint(jobs_api.blueprint)
+    api.add_resource(users_resource.UsersListResource, '/api/v2/users')
+    api.add_resource(users_resource.UsersResource, '/api/v2/users/<int:user_id>')
     app.run(port=8080, host='127.0.0.1', debug=True)

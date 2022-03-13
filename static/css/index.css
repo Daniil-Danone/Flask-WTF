@@ -120,9 +120,7 @@
 .text-index-page {
     margin-top: 20px;
     margin-bottom: 20px;
-    border-top: none;
-    border-right: none;
-    border-left: none;
+    border: none
 }
 
 .text-index-page-title {
@@ -249,4 +247,9 @@ main {
 .info-weather-date {
     margin-top: 20px;
     border-top: 1px solid #86b7fe;
+}
+
+.weather-index-page {
+    margin-top: 10px;
+    margin-bottom: 20px;
 }

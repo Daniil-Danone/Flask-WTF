@@ -208,7 +208,7 @@ def registration():
                 img.save(f'{filename}')
                 image = Image.open(filename)
                 h, w = image.size
-                scale = 200 / max(h, w)
+                scale = 300 / max(h, w)
                 image.resize((int(h * scale), int(w * scale)), Image.ANTIALIAS).save("resized.png")
                 disk.upload('resized.png', f"/Site-avatars/{filename}")
                 disk.publish(f"/Site-avatars/{filename}")

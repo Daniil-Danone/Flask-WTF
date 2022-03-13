@@ -59,7 +59,7 @@ def load_profile():
             user.image_link = disk.get_download_link(user.disk_path)                 # получаю новую ссылку на скачивание изображения
             db_sess.commit()
 
-            os.remove(f'static/images/avatars/avatar{current_user.id}.png')        # удаляю прежний аватар из "временного хранилища"
+            os.remove(f'static/images/avatars/avatar{current_user.id}.png')          # удаляю прежний аватар из "временного хранилища"
             request = requests.get(current_user.image_link)                          # получаю данные аватара через запрос по сгенерировавшейся выше ссылке
 
             with open(f'static/images/avatars/avatar{current_user.id}.png', 'wb') as f:
